@@ -16,9 +16,7 @@ namespace Client {
         const int head_size = 1;
         const string key = "key";
 
-        static bool isRunning = true;
-
-             static string? Receive(NetworkStream stream) {
+        static string? Receive(NetworkStream stream) {
             try {
                 //WE RECIEVE MESSAGE IN BYTES (ARRAY OF BYTES WITH SIZE I SET EARLIER)
                 byte[] recievedBytes = new byte[msg_size];
@@ -59,41 +57,41 @@ namespace Client {
                 Console.WriteLine(value: e.Message + "\n");
                 return null;
             }
-            
+
         }
 
 
         static void Main(string[] args) {
-                Console.WriteLine("\nClient:");
-                while (true) {
-                    Console.WriteLine("\nEnter command: ");
-                    string input = Console.ReadLine();
-                    if (input == "q") {
-                        break;
-                    }
-                    try {
-                        TcpClient client = new TcpClient();
-                        client.Connect(ip, port);
+            Console.WriteLine("\nClient:");
+            while (true) {
+                Console.WriteLine("\nEnter command: ");
+                string input = Console.ReadLine();
+                if (input == "q") {
+                    break;
+                }
+                try {
+                    TcpClient client = new TcpClient();
+                    client.Connect(ip, port);
 
-                        NetworkStream stream = client.GetStream();
-                        Send(stream, input);
-                        string answer = Receive(stream);
+                    NetworkStream stream = client.GetStream();
+                    Send(stream, input);
+                    string answer = Receive(stream);
 
                     if (input[0] == 'G') {
 
                         answer += " --DECRYPTING--> " + Decrypt(answer);
                     }
-                     
-                        Console.WriteLine("Client answer: " + answer);
-                    }
-                    catch (Exception e) {
-                        Console.WriteLine(value: e.Message + "\n");
-                    }
+
+                    Console.WriteLine("Client answer: " + answer);
                 }
-                Console.WriteLine("\nPress any key to exit.");
-                Console.ReadKey();
-
-
+                catch (Exception e) {
+                    Console.WriteLine(value: e.Message + "\n");
+                }
             }
+            Console.WriteLine("\nPress any key to exit.");
+            Console.ReadKey();
+
+
         }
     }
+}

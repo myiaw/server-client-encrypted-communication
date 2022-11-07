@@ -52,12 +52,9 @@ namespace Server {
                 trDES.Padding = PaddingMode.PKCS7;
                 ICryptoTransform transform = trDES.CreateEncryptor();
                 byte[] data = Encoding.ASCII.GetBytes(toEncrypt);
-                byte[] hidden = transform.TransformFinalBlock(data, 0, data.Length);
+                byte[] encrypted = transform.TransformFinalBlock(data, 0, data.Length);
 
-                return Convert.ToBase64String(hidden, 0, hidden.Length);
-
-
-
+                return Convert.ToBase64String(encrypted, 0, encrypted.Length);
             }
             catch (Exception e) {
                 Console.WriteLine(value: e.Message + "\n");
@@ -65,9 +62,9 @@ namespace Server {
 
             }
 
-            }
-    
-    
+        }
+
+
 
         static void Main(string[] args) {
             TcpListener listener = new TcpListener(IPAddress.Parse(ip), port);
@@ -80,7 +77,7 @@ namespace Server {
                     Console.WriteLine("\nClient has connected with: " + client.Client.RemoteEndPoint.ToString());
                     string msg = Receive(stream);
 
-                    if(msg == "1") {
+                    if (msg == "1") {
                         isRunning = false;
                         break;
                     }
@@ -91,7 +88,7 @@ namespace Server {
                     string head = msg[0].ToString();
                     string body = " ";
 
-                    if(msg.Length > 1) {
+                    if (msg.Length > 1) {
                         body = msg.Substring(head_size, msg.Length - 1);
                         if (body[0] == ' ') {
                             body.Remove(0, 1);
@@ -99,7 +96,7 @@ namespace Server {
 
                     }
 
-               
+
 
 
                     switch (head) {
@@ -112,16 +109,16 @@ namespace Server {
                         case "C":
                             answer = Environment.CurrentDirectory; // CURRENT DIRECTORY
                             break;
-                        case "D": 
+                        case "D":
                             answer = body; //OUTPUT JUST THE BODY
                             break;
                         case "E":
-                            answer =  Environment.MachineName + "\n" + Environment.OSVersion.ToString();    //PC NAME AND OS VERSION
+                            answer = Environment.MachineName + "\n" + Environment.OSVersion.ToString();    //PC NAME AND OS VERSION
                             break;
                         case "G":
                             answer = Encrypt(body); //ENCRYPT
                             break;
-                        default: 
+                        default:
                             Console.WriteLine("NOT AN OPTION");
                             break;
                     }
