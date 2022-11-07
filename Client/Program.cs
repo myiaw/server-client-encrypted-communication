@@ -44,15 +44,22 @@ namespace Client {
 
 
         static string Decrypt(string toDecrypt) {
-            MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
-            TripleDESCryptoServiceProvider tdes = new TripleDESCryptoServiceProvider();
-            tdes.Key = md5.ComputeHash(Encoding.UTF8.GetBytes(key));     //kljuc sifre
-            tdes.Mode = CipherMode.ECB;
-            tdes.Padding = PaddingMode.PKCS7;
-            ICryptoTransform decryptor = tdes.CreateDecryptor();
-            byte[] datadsa = Convert.FromBase64String(toDecrypt);
-            byte[] shown = decryptor.TransformFinalBlock(datadsa, 0, datadsa.Length);
-            return Encoding.UTF8.GetString(shown);
+            try {
+                MD5 md5 = MD5.Create();
+                TripleDES trDES = TripleDES.Create();
+                trDES.Key = md5.ComputeHash(Encoding.UTF8.GetBytes(key));     //kljuc sifre
+                trDES.Mode = CipherMode.ECB;
+                trDES.Padding = PaddingMode.PKCS7;
+                ICryptoTransform transform = trDES.CreateDecryptor();
+                byte[] data = Convert.FromBase64String(toDecrypt);
+                byte[] decrypted = transform.TransformFinalBlock(data, 0, data.Length);
+                return Encoding.UTF8.GetString(decrypted);
+            }
+            catch (Exception e) {
+                Console.WriteLine(value: e.Message + "\n");
+                return null;
+            }
+            
         }
 
 

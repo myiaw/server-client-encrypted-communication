@@ -43,19 +43,29 @@ namespace Server {
 
 
         static string Encrypt(string toEncrypt) {
-            MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
-            UTF8Encoding utf8 = new UTF8Encoding();
-            TripleDESCryptoServiceProvider tdes = new TripleDESCryptoServiceProvider();
-            tdes.Key = md5.ComputeHash(Encoding.UTF8.GetBytes(key));     //kljuc sifre
-            tdes.Mode = CipherMode.ECB;
-            tdes.Padding = PaddingMode.PKCS7;
-            ICryptoTransform encryptor = tdes.CreateEncryptor();
-            byte[] datadsa = Encoding.ASCII.GetBytes(toEncrypt);
-            byte[] hidden = encryptor.TransformFinalBlock(datadsa, 0, datadsa.Length);
-            Console.WriteLine("Uspesno sifriranje.");
+            try {
+                MD5 md5 = MD5.Create();
+                TripleDES trDES = TripleDES.Create();
+                UTF8Encoding utf8 = new UTF8Encoding();
+                trDES.Key = md5.ComputeHash(Encoding.UTF8.GetBytes(key));
+                trDES.Mode = CipherMode.ECB;
+                trDES.Padding = PaddingMode.PKCS7;
+                ICryptoTransform transform = trDES.CreateEncryptor();
+                byte[] data = Encoding.ASCII.GetBytes(toEncrypt);
+                byte[] hidden = transform.TransformFinalBlock(data, 0, data.Length);
 
-            return Convert.ToBase64String(hidden, 0, hidden.Length);
-        }
+                return Convert.ToBase64String(hidden, 0, hidden.Length);
+
+
+
+            }
+            catch (Exception e) {
+                Console.WriteLine(value: e.Message + "\n");
+                return null;
+
+            }
+
+            }
     
     
 
@@ -70,7 +80,10 @@ namespace Server {
                     Console.WriteLine("\nClient has connected with: " + client.Client.RemoteEndPoint.ToString());
                     string msg = Receive(stream);
 
-
+                    if(msg == "1") {
+                        isRunning = false;
+                        break;
+                    }
 
                     Console.WriteLine("\nRecieved:" + msg);
                     string answer = "";
@@ -106,7 +119,10 @@ namespace Server {
                             answer =  Environment.MachineName + "\n" + Environment.OSVersion.ToString();    //PC NAME AND OS VERSION
                             break;
                         case "G":
-                            answer = Encrypt(body);
+                            answer = Encrypt(body); //ENCRYPT
+                            break;
+                        default: 
+                            Console.WriteLine("NOT AN OPTION");
                             break;
                     }
 
